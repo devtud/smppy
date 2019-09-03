@@ -27,7 +27,8 @@ class Application(abc.ABC):
         self.name = name
 
         if not logger:
-            self.logger = logging.getLogger('smpp-app')
+            logger = logging.getLogger('smpp-app')
+        self.logger = logger
 
     @abc.abstractmethod
     async def handle_bound_client(self, client: SmppClient) -> Union[SmppClient, None]:

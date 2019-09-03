@@ -14,6 +14,7 @@ class MySmppApp(Application):
 
     async def handle_bound_client(self, client: SmppClient) -> Union[SmppClient, None]:
         self.clients.append(client)
+        self.logger.debug(f'Client {client.system_id} connected.')
         return client
 
     async def handle_unbound_client(self, client: SmppClient):
@@ -22,10 +23,12 @@ class MySmppApp(Application):
     async def handle_sms_received(self, client: SmppClient, source_number: str,
                                   dest_number: str, text: str):
         self.logger.debug(f'Received {text} from {source_number}')
+        await client.send_sms(source=dest_number, dest=source_number,
+                              text=f'You have sent {text} to me...')
 
 
 loop = asyncio.get_event_loop()
 
-app = MySmppApp(name='smpp-server', logger=logging.getLogger('ess'))
+app = MySmppApp(name='smppy', logger=logging.getLogger('smppy'))
 
-app.run(loop=loop)
+app.run(loop=loop, host='localhost', port=2775)
